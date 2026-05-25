@@ -11,7 +11,6 @@ import { Loader2, CheckCircle, Trash2, LogOut } from "lucide-react"
 export function AdminPage() {
   const [posts, setPosts] = useState<PostWithImages[]>([])
   const [loading, setLoading] = useState(true)
-  const [eventId, setEventId] = useState<string | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -24,7 +23,6 @@ export function AdminPage() {
 
       const event = await api.getDemoEvent()
       if (event) {
-        setEventId(event.id)
         loadPosts(event.id)
       } else {
         setLoading(false)
