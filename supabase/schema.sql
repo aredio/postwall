@@ -66,12 +66,15 @@ create policy "Post images are viewable by everyone" on public.post_images
     )
   );
 
+create policy "Admins can view all post images" on public.post_images
+  for select using (auth.role() = 'authenticated');
+
 create policy "Anyone can insert a post image" on public.post_images
   for insert with check (true);
 
 -- Policies for Storage (event-media)
--- NOTA: O painel do Supabase cuida dessas políticas de Storage (storage.objects) 
--- automaticamente quando você criar o bucket "event-media" e marcá-lo como "Public" no menu Storage.
+create policy "Anyone can upload to event-media" on storage.objects
+  for insert with check (bucket_id = 'event-media');
 
 -- 4. Create Indexes
 create index posts_event_id_idx on public.posts(event_id);
