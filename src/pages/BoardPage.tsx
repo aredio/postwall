@@ -34,7 +34,7 @@ export function BoardPage() {
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight drop-shadow-md">
                 Semana da Indústria 2026
               </h1>
-              <p className="text-white/70 mt-1">O que está rolando agora</p>
+              <p className="text-white/70 mt-1">Compartilhe conosco sua experiência no evento!</p>
             </div>
           </div>
           
