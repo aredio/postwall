@@ -53,24 +53,30 @@ export function PostCard({ post }: PostCardProps) {
   }
 
   return (
-    <Card className="break-inside-avoid mb-6 overflow-hidden border-primary/5 shadow-md hover:shadow-lg transition-shadow duration-300 bg-card/80 backdrop-blur-sm">
-      <CardHeader className="p-4 pb-2 flex flex-row items-center space-x-3 space-y-0">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-primary-foreground font-bold shadow-inner">
-          {initials}
-        </div>
-        <div className="flex flex-col">
-          <span className="font-semibold text-sm leading-tight">{author}</span>
-          <span className="text-xs text-muted-foreground">{timeAgo}</span>
-        </div>
-      </CardHeader>
+    <div className="relative overflow-hidden rounded-xl p-[2px] group break-inside-avoid mb-6 shadow-[0_0_15px_rgba(57,255,20,0.1)] hover:shadow-[0_0_25px_rgba(57,255,20,0.2)] transition-shadow duration-300">
+      {/* Elemento que faz a borda animada (girando no fundo) */}
+      <div className="absolute top-1/2 left-1/2 w-[200%] h-[200%] md:w-[300%] md:h-[300%] -translate-x-1/2 -translate-y-1/2 animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_70%,#39ff14_100%)] opacity-80" />
       
-      <CardContent className="p-4 pt-2 space-y-4">
-        <p className="text-base text-foreground/90 whitespace-pre-wrap leading-relaxed">
-          {post.message}
-        </p>
+      {/* O card real que fica por cima do gradiente como uma máscara */}
+      <Card className="relative h-full w-full border-none rounded-[10px] bg-card/90 backdrop-blur-md overflow-hidden z-10">
+        <CardHeader className="p-4 pb-2 flex flex-row items-center space-x-3 space-y-0">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-primary-foreground font-bold shadow-inner">
+            {initials}
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold text-sm leading-tight">{author}</span>
+            <span className="text-xs text-muted-foreground">{timeAgo}</span>
+          </div>
+        </CardHeader>
         
-        {renderImages()}
-      </CardContent>
-    </Card>
+        <CardContent className="p-4 pt-2 space-y-4">
+          <p className="text-base text-foreground/90 whitespace-pre-wrap leading-relaxed">
+            {post.message}
+          </p>
+          
+          {renderImages()}
+        </CardContent>
+      </Card>
+    </div>
   )
 }
