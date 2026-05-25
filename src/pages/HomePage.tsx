@@ -1,9 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { QrCode, MessageSquarePlus } from "lucide-react"
+import { MessageSquarePlus } from "lucide-react"
 import { Link } from "react-router-dom"
+import QRCode from "react-qr-code"
 
 export function HomePage() {
+  // Pega a URL exata de onde o site está rodando (localhost ou Vercel)
+  const postUrl = `${window.location.origin}/post`
+
   return (
     <div className="container py-10 md:py-20 max-w-4xl">
       <div className="flex flex-col items-center text-center space-y-8">
@@ -20,11 +24,18 @@ export function HomePage() {
         <Card className="w-full max-w-md overflow-hidden border-2 border-primary/10 bg-card/50 backdrop-blur">
           <CardContent className="p-8 flex flex-col items-center space-y-6">
             <div className="bg-white p-4 rounded-xl shadow-sm">
-              <QrCode className="w-48 h-48 text-black" />
+              <QRCode 
+                value={postUrl} 
+                size={192} 
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                viewBox={`0 0 256 256`}
+              />
             </div>
             <p className="text-sm font-medium text-muted-foreground text-center">
               Escaneie o QR Code ou acesse:<br/>
-              <span className="font-bold text-foreground">postwall.app/demo</span>
+              <span className="font-bold text-foreground break-all">
+                {postUrl.replace('https://', '').replace('http://', '')}
+              </span>
             </p>
             <Button asChild size="lg" className="w-full rounded-full font-semibold">
               <Link to="/post">
