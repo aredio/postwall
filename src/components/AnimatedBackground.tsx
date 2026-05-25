@@ -27,9 +27,9 @@ export function AnimatedBackground() {
 
   return (
     <div 
-      className="fixed inset-0 pointer-events-none -z-10 bg-black overflow-hidden"
+      className="fixed inset-0 pointer-events-none -z-10 bg-[#0000FF] overflow-hidden"
       style={{
-        backgroundImage: 'radial-gradient(circle at center, white 0%, #222 10%, black 60%)',
+        backgroundImage: 'radial-gradient(circle at center, #0000FF 0%, #0000CC 20%, #000066 60%, #000033 100%)',
       }}
     >
       <div 
