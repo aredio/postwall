@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { MessageSquarePlus } from "lucide-react"
 import { Link } from "react-router-dom"
-import QRCode from "react-qr-code"
+import { QRCodeSVG } from "qrcode.react"
 
 export function HomePage() {
   // Pega a URL exata de onde o site está rodando (localhost ou Vercel)
@@ -24,11 +24,10 @@ export function HomePage() {
         <Card className="w-full max-w-md overflow-hidden border-2 border-primary/10 bg-card/50 backdrop-blur">
           <CardContent className="p-8 flex flex-col items-center space-y-6">
             <div className="bg-white p-4 rounded-xl shadow-sm">
-              <QRCode 
+              <QRCodeSVG 
                 value={postUrl} 
                 size={192} 
                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                viewBox={`0 0 256 256`}
               />
             </div>
             <p className="text-sm font-medium text-muted-foreground text-center">
