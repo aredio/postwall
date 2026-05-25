@@ -14,7 +14,7 @@ export function HomePage() {
         
         <div className="space-y-4">
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-            Demo Event 2026
+            Semana da Indústria 2026
           </h1>
           <p className="text-xl text-muted-foreground max-w-[600px] mx-auto">
             Compartilhe suas fotos e experiências no nosso mural ao vivo.

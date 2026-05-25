@@ -99,6 +99,27 @@ export const api = {
     return data
   },
 
+  async getApprovedPosts(eventId: string) {
+    const { data, error } = await supabase
+      .from('posts')
+      .select(`
+        *,
+        post_images (
+          id,
+          image_url
+        )
+      `)
+      .eq('event_id', eventId)
+      .eq('approved', true)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Erro ao buscar posts aprovados:', error)
+      return []
+    }
+    return data
+  },
+
   async approvePost(postId: string) {
     const { error } = await supabase
       .from('posts')

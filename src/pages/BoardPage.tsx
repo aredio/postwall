@@ -32,7 +32,7 @@ export function BoardPage() {
             </div>
             <div>
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight drop-shadow-md">
-                Demo Event 2026
+                Semana da Indústria 2026
               </h1>
               <p className="text-white/70 mt-1">O que está rolando agora</p>
             </div>

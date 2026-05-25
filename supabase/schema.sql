@@ -86,4 +86,4 @@ alter publication supabase_realtime add table public.post_images;
 
 -- Setup Sample Event
 insert into public.events (slug, title, description)
-values ('demo-event', 'Demo Event 2026', 'Welcome to our social wall demo!');
+values ('demo-event', 'Semana da Indústria 2026', 'Welcome to our social wall demo!');

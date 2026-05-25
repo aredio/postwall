@@ -6,11 +6,13 @@ import type { PostWithImages } from "@/hooks/usePosts"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { toast } from "sonner"
-import { Loader2, CheckCircle, Trash2, LogOut } from "lucide-react"
+import { Loader2, CheckCircle, Trash2, LogOut, Clock, CheckSquare } from "lucide-react"
 
 export function AdminPage() {
-  const [posts, setPosts] = useState<PostWithImages[]>([])
+  const [pendingPosts, setPendingPosts] = useState<PostWithImages[]>([])
+  const [approvedPosts, setApprovedPosts] = useState<PostWithImages[]>([])
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'pending' | 'approved'>('pending')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -23,7 +25,7 @@ export function AdminPage() {
 
       const event = await api.getDemoEvent()
       if (event) {
-        loadPosts(event.id)
+        loadAllPosts(event.id)
       } else {
         setLoading(false)
       }
@@ -32,28 +34,45 @@ export function AdminPage() {
     checkAuthAndLoad()
   }, [navigate])
 
-  const loadPosts = async (evtId: string) => {
+  const loadAllPosts = async (evtId: string) => {
     setLoading(true)
-    const pendingPosts = await api.getPendingPosts(evtId)
-    setPosts(pendingPosts as unknown as PostWithImages[])
+    const [pending, approved] = await Promise.all([
+      api.getPendingPosts(evtId),
+      api.getApprovedPosts(evtId)
+    ])
+    setPendingPosts(pending as unknown as PostWithImages[])
+    setApprovedPosts(approved as unknown as PostWithImages[])
     setLoading(false)
   }
 
   const handleApprove = async (postId: string) => {
     try {
       await api.approvePost(postId)
-      setPosts(posts.filter(p => p.id !== postId))
+      // Move from pending to approved in the local state
+      const approvedPost = pendingPosts.find(p => p.id === postId)
+      if (approvedPost) {
+        setPendingPosts(pendingPosts.filter(p => p.id !== postId))
+        setApprovedPosts([{...approvedPost, approved: true}, ...approvedPosts])
+      }
       toast.success("Post aprovado com sucesso!")
     } catch (error) {
       toast.error("Erro ao aprovar o post")
     }
   }
 
-  const handleDelete = async (postId: string) => {
+  const handleDelete = async (postId: string, isApproved: boolean) => {
     try {
+      if (!confirm("Tem certeza que deseja apagar permanentemente este post?")) return;
+      
       await api.deletePost(postId)
-      setPosts(posts.filter(p => p.id !== postId))
-      toast.success("Post removido e rejeitado!")
+      
+      if (isApproved) {
+        setApprovedPosts(approvedPosts.filter(p => p.id !== postId))
+      } else {
+        setPendingPosts(pendingPosts.filter(p => p.id !== postId))
+      }
+      
+      toast.success("Post apagado com sucesso!")
     } catch (error) {
       toast.error("Erro ao deletar o post")
     }
@@ -72,13 +91,15 @@ export function AdminPage() {
     )
   }
 
+  const currentPosts = activeTab === 'pending' ? pendingPosts : approvedPosts
+
   return (
     <div className="container py-10 max-w-4xl">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold">Painel de Moderação</h1>
           <p className="text-muted-foreground mt-1">
-            {posts.length} {posts.length === 1 ? 'post aguardando' : 'posts aguardando'} aprovação.
+            Gerencie os posts da Semana da Indústria 2026.
           </p>
         </div>
         <Button variant="outline" onClick={handleLogout}>
@@ -87,15 +108,34 @@ export function AdminPage() {
         </Button>
       </div>
 
-      {posts.length === 0 ? (
+      <div className="flex space-x-2 mb-8 bg-muted/30 p-1 rounded-lg w-max">
+        <Button 
+          variant={activeTab === 'pending' ? 'default' : 'ghost'} 
+          onClick={() => setActiveTab('pending')}
+        >
+          <Clock className="mr-2 h-4 w-4" />
+          Pendentes ({pendingPosts.length})
+        </Button>
+        <Button 
+          variant={activeTab === 'approved' ? 'default' : 'ghost'} 
+          onClick={() => setActiveTab('approved')}
+        >
+          <CheckSquare className="mr-2 h-4 w-4" />
+          Aprovados ({approvedPosts.length})
+        </Button>
+      </div>
+
+      {currentPosts.length === 0 ? (
         <Card className="flex flex-col items-center justify-center py-16 bg-muted/50">
           <CheckCircle className="h-16 w-16 text-muted-foreground/50 mb-4" />
           <h3 className="text-xl font-medium">Tudo limpo por aqui!</h3>
-          <p className="text-muted-foreground">Não há novos posts aguardando aprovação no momento.</p>
+          <p className="text-muted-foreground">
+            {activeTab === 'pending' ? 'Não há novos posts aguardando aprovação.' : 'Nenhum post foi aprovado ainda.'}
+          </p>
         </Card>
       ) : (
         <div className="grid gap-6">
-          {posts.map(post => (
+          {currentPosts.map(post => (
             <Card key={post.id} className="overflow-hidden">
               <CardHeader className="bg-muted/30 py-3 border-b">
                 <CardTitle className="text-base flex justify-between items-center">
@@ -121,14 +161,16 @@ export function AdminPage() {
                 )}
               </CardContent>
               <CardFooter className="bg-muted/10 flex justify-end gap-3 p-4 border-t">
-                <Button variant="destructive" onClick={() => handleDelete(post.id)}>
+                <Button variant="destructive" onClick={() => handleDelete(post.id, activeTab === 'approved')}>
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Rejeitar
+                  Apagar
                 </Button>
-                <Button onClick={() => handleApprove(post.id)}>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Aprovar
-                </Button>
+                {activeTab === 'pending' && (
+                  <Button onClick={() => handleApprove(post.id)}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Aprovar
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}
